@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LKPD Interaktif IPA VII - Perubahan Fisika & Kimia</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- html2pdf.js CDN for exporting PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: {
+                            50: '#FAF6F0',
+                            100: '#F4ECE1',
+                            200: '#E8D8C3',
+                            300: '#DCC3A5',
+                        },
+                        brown: {
+                            500: '#A67B5B',
+                            600: '#8C5A3C',
+                            700: '#6F422A',
+                            800: '#4A2B19',
+                            900: '#321B0F',
+                        },
+                        amberAccent: '#D97706',
+                        warmYellow: '#FEF3C7',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF6F0;
+            color: #321B0F;
+        }
+
+        /* Custom styling for print/pdf export */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            #lkpd-content {
+                padding-top: 0 !important;
+                margin-top: 0 !important;
+            }
+            .shadow-custom {
+                box-shadow: none !important;
+            }
+            section, header {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+
+        .shadow-custom {
+            box-shadow: 0 8px 24px -4px rgba(74, 43, 25, 0.08), 0 4px 12px -2px rgba(74, 43, 25, 0.04);
+        }
+
+        .drop-zone {
+            min-height: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .draggable-item {
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .draggable-item:active {
+            cursor: grabbing;
+            transform: scale(1.03);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F4ECE1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #A67B5B;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8C5A3C;
+        }
+    </style>
+</head>
+<body class="bg-cream-50 text-brown-900 min-h-screen pb-24">
+
+    <!-- Floating Action Toolbar -->
+    <div class="no-print fixed bottom-4 right-4 sm:right-8 z-50 flex flex-wrap gap-2 sm:gap-3 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl border border-cream-200">
+        <button onclick="saveDraft()" class="px-4 py-2.5 bg-cream-200 hover:bg-cream-300 text-brown-800 font-semibold rounded-xl text-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-floppy-disk"></i> <span class="hidden sm:inline">Simpan Sementara</span>
+        </button>
+        <button onclick="downloadPDF()" class="px-5 py-2.5 bg-brown-700 hover:bg-brown-800 text-white font-semibold rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-brown-700/30">
+            <i class="fa-solid fa-file-pdf"></i> <span>Unduh PDF</span>
+        </button>
+        <button onclick="window.print()" class="px-4 py-2.5 bg-amberAccent hover:bg-amber-600 text-white font-semibold rounded-xl text-sm transition flex items-center gap-2">
+            <i class="fa-solid fa-print"></i> <span class="hidden sm:inline">Cetak</span>
+        </button>
+    </div>
+
+    <div id="lkpd-content" class="max-w-5xl mx-auto px-4 py-6 sm:px-6 lg:px-8 space-y-8">
+        
+        <!-- HEADER LKPD -->
+        <header class="bg-gradient-to-r from-brown-800 via-brown-700 to-brown-800 text-white p-6 sm:p-8 rounded-3xl shadow-custom relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl font-extrabold pointer-events-none">
+                <i class="fa-solid fa-flask-vial"></i>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-brown-600/60">
+                <div>
+                    <span class="inline-block bg-amberAccent/30 text-amber-200 text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-2 border border-amberAccent/40">
+                        LEMBAR KERJA PESERTA DIDIK (LKPD) INTERAKTIF
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-amber-100">
+                        Perubahan Fisika dan Kimia
+                    </h1>
+                    <p class="text-cream-100 text-sm sm:text-base mt-1">Mata Pelajaran: Ilmu Pengetahuan Alam (IPA) - Kelas VII MTs/SMP</p>
+                </div>
+                <div class="bg-brown-900/50 backdrop-blur-sm p-3.5 rounded-2xl border border-cream-200/20 text-right self-stretch md:self-auto flex md:flex-col justify-between items-center md:items-end">
+                    <span class="text-xs text-cream-200 font-medium block">Penyusun:</span>
+                    <span class="text-sm font-bold text-amber-200 block">Khuzaimatul Fitriyah, M.Si.</span>
+                    <span class="text-xs text-cream-100/90 block mt-0.5"><i class="fa-solid fa-school mr-1"></i> MTsN 1 Kota Malang</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 text-xs sm:text-sm">
+                <div class="bg-brown-900/40 p-3 rounded-xl border border-brown-600/30">
+                    <span class="text-cream-300 block text-xs">Fase / Semester</span>
+                    <span class="font-bold text-white">Fase D / Genap</span>
+                </div>
+                <div class="bg-brown-900/40 p-3 rounded-xl border border-brown-600/30">
+                    <span class="text-cream-300 block text-xs">Alokasi Waktu</span>
+                    <span class="font-bold text-white">2 x 40 Menit</span>
+                </div>
+                <div class="bg-brown-900/40 p-3 rounded-xl border border-brown-600/30">
+                    <span class="text-cream-300 block text-xs">Model Pembelajaran</span>
+                    <span class="font-bold text-white">Discovery Learning</span>
+                </div>
+                <div class="bg-brown-900/40 p-3 rounded-xl border border-brown-600/30">
+                    <span class="text-cream-300 block text-xs">Metode</span>
+                    <span class="font-bold text-white">Pengamatan & Diskusi</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- FORM IDENTITAS KELOMPOK -->
+        <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-custom border border-cream-200">
+            <div class="flex items-center gap-3 mb-6 pb-3 border-b border-cream-100">
+                <div class="w-10 h-10 rounded-2xl bg-amberAccent/10 text-amberAccent flex items-center justify-center font-bold text-lg">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-brown-900">Identitas Kelompok</h2>
+                    <p class="text-xs text-brown-600">Lengkapi data kelompok sebelum memulai mengerjakan aktivitas LKPD</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label class="block text-xs font-bold text-brown-800 uppercase tracking-wide mb-1.5">Nama Kelompok <span class="text-red-500">*</span></label>
+                    <input type="text" id="nama-kelompok" placeholder="Contoh: Kelompok Newton" class="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brown-800 uppercase tracking-wide mb-1.5">Kelas <span class="text-red-500">*</span></label>
+                    <input type="text" id="kelas" placeholder="Contoh: VII-A" class="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brown-800 uppercase tracking-wide mb-1.5">Tanggal Pengerjaan</label>
+                    <input type="date" id="tanggal" class="w-full px-4 py-2.5 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-brown-800 uppercase tracking-wide mb-2">Anggota Kelompok:</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <input type="text" id="anggota-1" placeholder="1. Nama Anggota (Ketua)" class="px-3.5 py-2 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-xs sm:text-sm">
+                    <input type="text" id="anggota-2" placeholder="2. Nama Anggota" class="px-3.5 py-2 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-xs sm:text-sm">
+                    <input type="text" id="anggota-3" placeholder="3. Nama Anggota" class="px-3.5 py-2 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-xs sm:text-sm">
+                    <input type="text" id="anggota-4" placeholder="4. Nama Anggota" class="px-3.5 py-2 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-xs sm:text-sm">
+                    <input type="text" id="anggota-5" placeholder="5. Nama Anggota" class="px-3.5 py-2 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-xs sm:text-sm">
+                    <input type="text" id="anggota-6" placeholder="6. Nama Anggota (Opsional)" class="px-3.5 py-2 rounded-xl border border-cream-300 focus:outline-none focus:ring-2 focus:ring-brown-600 bg-cream-50 text-xs sm:text-sm">
+                </div>
+            </div>
+        </section>
+
+        <!-- TUJUAN & PETUNJUK -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-3xl shadow-custom border border-cream-200">
+                <div class="flex items-center gap-3 mb-4 text-brown-800">
+                    <i class="fa-solid fa-bullseye text-xl text-amberAccent"></i>
+                    <h3 class="text-lg font-bold">Tujuan Pembelajaran</h3>
+                </div>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-brown-800 list-disc list-inside">
+                    <li>Peserta didik mampu mengidentifikasi ciri-ciri perubahan fisika dan perubahan kimia berdasarkan hasil pengamatan.</li>
+                    <li>Peserta didik mampu membedakan karakteristik perubahan fisika dan kimia dalam kehidupan sehari-hari.</li>
+                    <li>Peserta didik mampu mengklasifikasikan berbagai contoh peristiwa di lingkungan sekitar ke dalam perubahan fisika atau kimia.</li>
+                </ul>
+            </div>
+
+            <div class="bg-amber-50/60 p-6 rounded-3xl shadow-custom border border-amber-200/80">
+                <div class="flex items-center gap-3 mb-4 text-brown-900">
+                    <i class="fa-solid fa-circle-info text-xl text-amberAccent"></i>
+                    <h3 class="text-lg font-bold">Petunjuk Pengerjaan LKPD</h3>
+                </div>
+                <ol class="space-y-2 text-xs sm:text-sm text-brown-800 list-decimal list-inside">
+                    <li>Bacalah orientasi masalah dan lakukan simulasi eksperimen virtual yang disediakan.</li>
+                    <li>Isilah tabel pengamatan berdasarkan ciri-ciri perubahan yang kalian amati.</li>
+                    <li>Kerjakan game interaktif pengelompokan jenis perubahan materi.</li>
+                    <li>Jawablah pertanyaan analisis data dan susunlah kesimpulan bersama kelompok.</li>
+                    <li>Selesaikan soal evaluasi mandiri untuk menguji pemahaman kelompok.</li>
+                    <li>Tekan tombol <strong>"Unduh PDF"</strong> untuk mengunduh hasil pengerjaan LKPD kelompok kalian.</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- KEGIATAN 1: ORIENTASI MASALAH & VIRTUAL EKSPERIMEN -->
+        <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-custom border border-cream-200 space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-cream-100 flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-brown-700 text-white font-bold flex items-center justify-center text-sm">1</span>
+                    <h2 class="text-xl font-bold text-brown-900">Kegiatan 1: Simulasi Pengamatan Perubahan Materi</h2>
+                </div>
+                <span class="text-xs bg-cream-100 text-brown-800 font-semibold px-3 py-1 rounded-full border border-cream-200">
+                    <i class="fa-solid fa-flask mr-1"></i> Eksperimen Interaktif
+                </span>
+            </div>
+
+            <p class="text-sm text-brown-800 leading-relaxed">
+                Amatilah 5 skenario perubahan materi berikut. Klik tombol <strong>"Jalankan Proses"</strong> pada setiap tab fenomena untuk melihat visualisasi dan perubahan karakteristik zat, lalu catat hasil pengamatan kalian pada tabel yang telah disediakan.
+            </p>
+
+            <!-- Interactive Simulation Tabs & Viewer -->
+            <div class="bg-cream-50 p-5 rounded-2xl border border-cream-200">
+                <!-- Tab Selector -->
+                <div class="flex overflow-x-auto gap-2 pb-3 mb-4 border-b border-cream-200" id="sim-tabs">
+                    <button onclick="switchSim(0)" id="tab-0" class="sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-brown-700 text-white">
+                        1. Es Mencair
+                    </button>
+                    <button onclick="switchSim(1)" id="tab-1" class="sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white text-brown-800 hover:bg-cream-200">
+                        2. Kertas Dibakar
+                    </button>
+                    <button onclick="switchSim(2)" id="tab-2" class="sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white text-brown-800 hover:bg-cream-200">
+                        3. Gula Dilarutkan
+                    </button>
+                    <button onclick="switchSim(3)" id="tab-3" class="sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white text-brown-800 hover:bg-cream-200">
+                        4. Paku Berkarat
+                    </button>
+                    <button onclick="switchSim(4)" id="tab-4" class="sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white text-brown-800 hover:bg-cream-200">
+                        5. Apel Membusuk
+                    </button>
+                </div>
+
+                <!-- Sim Visualizer Box -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div class="bg-white p-6 rounded-2xl border border-cream-300 text-center flex flex-col items-center justify-center min-h-[220px] relative overflow-hidden" id="sim-canvas">
+                        <!-- Dynamic Visual Container -->
+                        <div id="sim-icon-container" class="text-7xl mb-3 transition-all duration-700">
+                            <i class="fa-solid fa-cube text-blue-400"></i>
+                        </div>
+                        <h4 id="sim-title" class="font-bold text-brown-900 text-base">Es Batu Dipanaskan</h4>
+                        <p id="sim-status" class="text-xs text-brown-600 mt-1">Kondisi Awal: Padat (Es Batu)</p>
+                        
+                        <button onclick="triggerSimulation()" id="sim-action-btn" class="mt-4 px-5 py-2 bg-amberAccent hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition shadow-md">
+                            <i class="fa-solid fa-play mr-1"></i> Jalankan Proses
+                        </button>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div class="bg-white p-4 rounded-xl border border-cream-200 text-xs space-y-2">
+                            <h5 class="font-bold text-brown-900 text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-eye text-amberAccent"></i> Panduan Pengamatan Fenomena:
+                            </h5>
+                            <p id="sim-desc" class="text-brown-700 leading-relaxed">
+                                Amatilah bentuk, warna, wujud, dan zat baru yang dihasilkan ketika es batu diletakkan pada suhu ruang atau dipanaskan.
+                            </p>
+                        </div>
+                        <div class="bg-amber-100/60 p-3.5 rounded-xl border border-amber-200 text-xs text-brown-800">
+                            <strong>Pertanyaan Pemandu:</strong> Apakah wujud zat berubah? Apakah terbentuk zat baru dengan sifat yang benar-benar berbeda? Can process be reversed?
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABEL PENGAMATAN HASIL EKSPERIMEN -->
+            <div>
+                <h3 class="font-bold text-brown-900 text-sm sm:text-base mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-table-list text-brown-700"></i> Tabel Pengamatan Perubahan Materi
+                </h3>
+                <div class="overflow-x-auto rounded-2xl border border-cream-300">
+                    <table class="w-full text-xs sm:text-sm text-left">
+                        <thead class="bg-brown-700 text-white font-bold text-xs uppercase tracking-wider">
+                            <tr>
+                                <th class="p-3 text-center border-r border-brown-600 w-12">No</th>
+                                <th class="p-3 border-r border-brown-600 w-36">Peristiwa</th>
+                                <th class="p-3 border-r border-brown-600 min-w-[140px]">Kondisi Awal</th>
+                                <th class="p-3 border-r border-brown-600 min-w-[140px]">Kondisi Akhir</th>
+                                <th class="p-3 border-r border-brown-600 min-w-[160px]">Ciri-Ciri Perubahan</th>
+                                <th class="p-3 min-w-[150px]">Jenis Perubahan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-cream-200 bg-white">
+                            <!-- Row 1 -->
+                            <tr class="hover:bg-cream-50/50">
+                                <td class="p-3 text-center font-bold border-r border-cream-200">1</td>
+                                <td class="p-3 font-semibold border-r border-cream-200">Es Mencair</td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-1-awal" placeholder="Contoh: Padat, dingin" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-1-akhir" placeholder="Contoh: Cair, bening" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-1-ciri" placeholder="Perubahan wujud padat ke cair" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3">
+                                    <select id="obs-1-jenis" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 font-medium focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Perubahan Fisika">Perubahan Fisika</option>
+                                        <option value="Perubahan Kimia">Perubahan Kimia</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr class="hover:bg-cream-50/50">
+                                <td class="p-3 text-center font-bold border-r border-cream-200">2</td>
+                                <td class="p-3 font-semibold border-r border-cream-200">Kertas Dibakar</td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-2-awal" placeholder="Contoh: Lembaran putih" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-2-akhir" placeholder="Contoh: Abu hitam, asap" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-2-ciri" placeholder="Terbentuk abu, warna berubah" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3">
+                                    <select id="obs-2-jenis" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 font-medium focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Perubahan Fisika">Perubahan Fisika</option>
+                                        <option value="Perubahan Kimia">Perubahan Kimia</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr class="hover:bg-cream-50/50">
+                                <td class="p-3 text-center font-bold border-r border-cream-200">3</td>
+                                <td class="p-3 font-semibold border-r border-cream-200">Gula Dilarutkan</td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-3-awal" placeholder="Kristal gula + air" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-3-akhir" placeholder="Larutan manis bening" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-3-ciri" placeholder="Gula melarut, rasa manis tetap" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3">
+                                    <select id="obs-3-jenis" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 font-medium focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Perubahan Fisika">Perubahan Fisika</option>
+                                        <option value="Perubahan Kimia">Perubahan Kimia</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <!-- Row 4 -->
+                            <tr class="hover:bg-cream-50/50">
+                                <td class="p-3 text-center font-bold border-r border-cream-200">4</td>
+                                <td class="p-3 font-semibold border-r border-cream-200">Paku Berkarat</td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-4-awal" placeholder="Besi mengkilap, abu-abu" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-4-akhir" placeholder="Lapisan cokelat kemerahan" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-4-ciri" placeholder="Terbentuk zat baru (karat)" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3">
+                                    <select id="obs-4-jenis" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 font-medium focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Perubahan Fisika">Perubahan Fisika</option>
+                                        <option value="Perubahan Kimia">Perubahan Kimia</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <!-- Row 5 -->
+                            <tr class="hover:bg-cream-50/50">
+                                <td class="p-3 text-center font-bold border-r border-cream-200">5</td>
+                                <td class="p-3 font-semibold border-r border-cream-200">Apel Membusuk</td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-5-awal" placeholder="Buah segar, warna terang" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-5-akhir" placeholder="Cokelat, lunak, berbau" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3 border-r border-cream-200">
+                                    <input type="text" id="obs-5-ciri" placeholder="Bau membusuk, warna berubah" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                </td>
+                                <td class="p-3">
+                                    <select id="obs-5-jenis" class="w-full p-2 border border-cream-300 rounded-lg bg-cream-50 font-medium focus:outline-none focus:ring-1 focus:ring-brown-600">
+                                        <option value="">-- Pilih --</option>
+                                        <option value="Perubahan Fisika">Perubahan Fisika</option>
+                                        <option value="Perubahan Kimia">Perubahan Kimia</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- KEGIATAN 2: GAME KLASIFIKASI INTERAKTIF -->
+        <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-custom border border-cream-200 space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-cream-100 flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-brown-700 text-white font-bold flex items-center justify-center text-sm">2</span>
+                    <h2 class="text-xl font-bold text-brown-900">Kegiatan 2: Game Klasifikasi Perubahan Materi</h2>
+                </div>
+                <span class="text-xs bg-amber-100 text-brown-800 font-semibold px-3 py-1 rounded-full border border-amber-200">
+                    <i class="fa-solid fa-gamepad mr-1 text-amberAccent"></i> Permainan Interaktif
+                </span>
+            </div>
+
+            <p class="text-sm text-brown-800">
+                Pindahkan atau klik tombol kategori pada setiap kartu peristiwa di bawah ini untuk mengelompokkan ke dalam <strong>Perubahan Fisika</strong> atau <strong>Perubahan Kimia</strong>!
+            </p>
+
+            <!-- Cards Pool -->
+            <div class="bg-cream-50 p-4 rounded-2xl border border-cream-200">
+                <h4 class="text-xs font-bold text-brown-700 uppercase tracking-wider mb-3">Daftar Peristiwa Perubahan Materi:</h4>
+                <div id="card-pool" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- Cards initialized by JS -->
+                </div>
+            </div>
+
+            <!-- Classification Bins -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Bin Fisika -->
+                <div class="bg-blue-50/70 p-5 rounded-2xl border-2 border-dashed border-blue-300 drop-zone flex flex-col" id="bin-fisika">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-blue-900 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-water text-blue-600"></i> PERUBAHAN FISIKA
+                        </h4>
+                        <span id="count-fisika" class="text-xs font-bold bg-blue-200 text-blue-900 px-2.5 py-0.5 rounded-full">0 Kartu</span>
+                    </div>
+                    <p class="text-xs text-blue-700 mb-3">(Tidak menghasilkan zat baru, wujud/bentuk dapat berubah)</p>
+                    <div id="content-fisika" class="space-y-2 flex-grow min-h-[100px] p-2 bg-white/60 rounded-xl border border-blue-100">
+                        <!-- Placed items go here -->
+                    </div>
+                </div>
+
+                <!-- Bin Kimia -->
+                <div class="bg-amber-50/70 p-5 rounded-2xl border-2 border-dashed border-amber-300 drop-zone flex flex-col" id="bin-kimia">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-amber-900 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-fire text-amber-600"></i> PERUBAHAN KIMIA
+                        </h4>
+                        <span id="count-kimia" class="text-xs font-bold bg-amber-200 text-amber-900 px-2.5 py-0.5 rounded-full">0 Kartu</span>
+                    </div>
+                    <p class="text-xs text-amber-700 mb-3">(Menghasilkan zat baru dengan sifat yang berbeda)</p>
+                    <div id="content-kimia" class="space-y-2 flex-grow min-h-[100px] p-2 bg-white/60 rounded-xl border border-amber-100">
+                        <!-- Placed items go here -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-cream-100 p-4 rounded-xl border border-cream-200">
+                <span id="game-score-feedback" class="text-xs font-semibold text-brown-800">
+                    Kelompokkan semua 6 kartu peristiwa di atas.
+                </span>
+                <button onclick="checkGameScore()" class="px-4 py-2 bg-brown-700 hover:bg-brown-800 text-white font-bold text-xs rounded-xl transition">
+                    <i class="fa-solid fa-circle-check mr-1"></i> Periksa Klasifikasi
+                </button>
+            </div>
+        </section>
+
+        <!-- KEGIATAN 3: ANALISIS DATA & DISKUSI -->
+        <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-custom border border-cream-200 space-y-6">
+            <div class="flex items-center gap-3 pb-4 border-b border-cream-100">
+                <span class="w-8 h-8 rounded-xl bg-brown-700 text-white font-bold flex items-center justify-center text-sm">3</span>
+                <h2 class="text-xl font-bold text-brown-900">Kegiatan 3: Pertanyaan Analisis & Diskusi Kelompok</h2>
+            </div>
+
+            <div class="space-y-5 text-sm text-brown-900">
+                <!-- Q1 -->
+                <div class="space-y-2 bg-cream-50/70 p-4 rounded-2xl border border-cream-200">
+                    <label class="font-bold text-brown-900 block">
+                        1. Berdasarkan pengamatan pada Kegiatan 1, apakah pada saat es mencair dan gula dilarutkan terbentuk jenis zat baru? Jelaskan alasan kelompok kalian!
+                    </label>
+                    <textarea id="q1-answer" rows="3" placeholder="Tuliskan jawaban diskusi kelompok di sini..." class="w-full p-3 rounded-xl border border-cream-300 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brown-600"></textarea>
+                </div>
+
+                <!-- Q2 -->
+                <div class="space-y-2 bg-cream-50/70 p-4 rounded-2xl border border-cream-200">
+                    <label class="font-bold text-brown-900 block">
+                        2. Apa yang terjadi ketika kertas dibakar dan paku dibiarkan di tempat terbuka hingga berkarat? Sebutkan tanda-tanda atau ciri-ciri reaksi yang menyertainya!
+                    </label>
+                    <textarea id="q2-answer" rows="3" placeholder="Tuliskan jawaban diskusi kelompok di sini..." class="w-full p-3 rounded-xl border border-cream-300 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brown-600"></textarea>
+                </div>
+
+                <!-- Q3 -->
+                <div class="space-y-2 bg-cream-50/70 p-4 rounded-2xl border border-cream-200">
+                    <label class="font-bold text-brown-900 block">
+                        3. Sebutkan 4 (empat) ciri-ciri utama yang menandakan telah terjadinya suatu Perubahan Kimia!
+                    </label>
+                    <textarea id="q3-answer" rows="3" placeholder="Contoh: Terbentuk gas, terjadi perubahan warna..." class="w-full p-3 rounded-xl border border-cream-300 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brown-600"></textarea>
+                </div>
+
+                <!-- Q4 -->
+                <div class="space-y-2 bg-cream-50/70 p-4 rounded-2xl border border-cream-200">
+                    <label class="font-bold text-brown-900 block">
+                        4. Sebutkan masing-masing 3 contoh Perubahan Fisika dan Perubahan Kimia yang sering kalian temukan dalam kehidupan sehari-hari di rumah atau lingkungan sekolah!
+                    </label>
+                    <textarea id="q4-answer" rows="3" placeholder="Perubahan Fisika: ... &#10;Perubahan Kimia: ..." class="w-full p-3 rounded-xl border border-cream-300 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brown-600"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- KEGIATAN 4: KESIMPULAN -->
+        <section class="bg-gradient-to-br from-brown-800 to-brown-900 text-white p-6 sm:p-8 rounded-3xl shadow-custom space-y-4">
+            <div class="flex items-center gap-3 pb-3 border-b border-brown-700">
+                <span class="w-8 h-8 rounded-xl bg-amberAccent text-white font-bold flex items-center justify-center text-sm">4</span>
+                <h2 class="text-xl font-bold text-amber-100">Kegiatan 4: Kesimpulan Pembelajaran</h2>
+            </div>
+            
+            <p class="text-xs sm:text-sm text-cream-100">
+                Lengkapilah kalimat kesimpulan di bawah ini berdasarkan hasil penyelidikan dan diskusi yang telah kalian lakukan:
+            </p>
+
+            <div class="space-y-4 text-xs sm:text-sm">
+                <div class="bg-brown-900/60 p-4 rounded-2xl border border-brown-600/50 space-y-2">
+                    <p class="font-semibold text-amber-200">a. Perubahan Fisika adalah:</p>
+                    <textarea id="kesimpulan-fisika" rows="2" placeholder="Perubahan zat yang..." class="w-full p-3 rounded-xl bg-brown-800 text-white border border-brown-600 focus:outline-none focus:border-amberAccent text-xs sm:text-sm"></textarea>
+                </div>
+
+                <div class="bg-brown-900/60 p-4 rounded-2xl border border-brown-600/50 space-y-2">
+                    <p class="font-semibold text-amber-200">b. Perubahan Kimia adalah:</p>
+                    <textarea id="kesimpulan-kimia" rows="2" placeholder="Perubahan zat yang menghasilkan..." class="w-full p-3 rounded-xl bg-brown-800 text-white border border-brown-600 focus:outline-none focus:border-amberAccent text-xs sm:text-sm"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- EVALUASI FORMATIF / KUIS -->
+        <section class="bg-white p-6 sm:p-8 rounded-3xl shadow-custom border border-cream-200 space-y-6">
+            <div class="flex items-center justify-between pb-4 border-b border-cream-100 flex-wrap gap-2">
+                <div class="flex items-center gap-3">
+                    <i class="fa-solid fa-graduation-cap text-2xl text-amberAccent"></i>
+                    <h2 class="text-xl font-bold text-brown-900">Evaluasi Mandiri (Kuis Formatif)</h2>
+                </div>
+                <div id="quiz-score-badge" class="hidden px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-300">
+                    Skor Kuis: <span id="score-val">0</span> / 100
+                </div>
+            </div>
+
+            <p class="text-xs sm:text-sm text-brown-800">
+                Pilihlah salah satu jawaban yang paling tepat pada setiap soal di bawah ini:
+            </p>
+
+            <div class="space-y-6 text-xs sm:text-sm">
+                <!-- Soal 1 -->
+                <div class="p-4 rounded-2xl bg-cream-50 border border-cream-200 space-y-3">
+                    <p class="font-bold text-brown-900">1. Peristiwa berikut yang TERMASUK perubahan fisika adalah...</p>
+                    <div class="space-y-2 pl-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q1" value="A" class="accent-brown-700"> A. Besi dipanaskan hingga berkarat
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q1" value="B" class="accent-brown-700"> B. Lilin meleleh saat dipanaskan
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q1" value="C" class="accent-brown-700"> C. Singkong mengalami fermentasi menjadi tapai
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q1" value="D" class="accent-brown-700"> D. Kayu dibakar menjadi arang
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Soal 2 -->
+                <div class="p-4 rounded-2xl bg-cream-50 border border-cream-200 space-y-3">
+                    <p class="font-bold text-brown-900">2. Ciri utama yang membedakan perubahan kimia dari perubahan fisika adalah...</p>
+                    <div class="space-y-2 pl-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q2" value="A" class="accent-brown-700"> A. Terjadinya perubahan bentuk dan wujud
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q2" value="B" class="accent-brown-700"> B. Terbentuknya zat jenis baru dengan sifat berbeda
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q2" value="C" class="accent-brown-700"> C. Dapat dikembalikan ke wujud asalnya dengan mudah
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q2" value="D" class="accent-brown-700"> D. Tidak terjadinya perubahan suhu
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Soal 3 -->
+                <div class="p-4 rounded-2xl bg-cream-50 border border-cream-200 space-y-3">
+                    <p class="font-bold text-brown-900">3. Ketika garam dilarutkan ke dalam air, rasa air menjadi asin. Peristiwa ini merupakan perubahan fisika karena...</p>
+                    <div class="space-y-2 pl-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q3" value="A" class="accent-brown-700"> A. Terbentuk gas dan endapan
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q3" value="B" class="accent-brown-700"> B. Garam berubah menjadi senyawa baru
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q3" value="C" class="accent-brown-700"> C. Sifat asal garam tidak hilang dan dapat dipisahkan kembali dengan penguapan
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q3" value="D" class="accent-brown-700"> D. Warna air berubah menjadi keruh permanen
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Soal 4 -->
+                <div class="p-4 rounded-2xl bg-cream-50 border border-cream-200 space-y-3">
+                    <p class="font-bold text-brown-900">4. Contoh perubahan kimia yang sering merugikan kehidupan sehari-hari dan cara pencegahannya yang tepat adalah...</p>
+                    <div class="space-y-2 pl-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q4" value="A" class="accent-brown-700"> A. Es mencair; dicegah dengan dibakar
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q4" value="B" class="accent-brown-700"> B. Pagar besi berkarat; dicegah dengan mengecat permukaan besi
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q4" value="C" class="accent-brown-700"> C. Beras menjadi tepung; dicegah dengan merebusnya
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer">
+                            <input type="radio" name="q4" value="D" class="accent-brown-700"> D. Air menguap; dicegah dengan diberi pewarna
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-2">
+                <button onclick="submitQuiz()" class="px-5 py-2.5 bg-amberAccent hover:bg-amber-600 text-white font-bold text-xs sm:text-sm rounded-xl transition shadow-md">
+                    <i class="fa-solid fa-check-double mr-1"></i> Periksa Jawaban Kuis
+                </button>
+                <div id="quiz-msg" class="text-xs font-bold text-brown-700"></div>
+            </div>
+        </section>
+
+        <!-- FOOTER / ATTRIBUTION -->
+        <footer class="bg-cream-100 p-6 rounded-3xl border border-cream-200 text-center text-xs text-brown-700 space-y-1">
+            <p class="font-bold text-brown-900">LKPD Interaktif Ilmu Pengetahuan Alam (IPA) Kelas VII MTs/SMP</p>
+            <p>Materi: Perubahan Fisika dan Perubahan Kimia</p>
+            <p class="text-brown-600 pt-1">Disusun oleh: <strong class="text-brown-800">Khuzaimatul Fitriyah, M.Si.</strong> &bull; MTsN 1 Kota Malang</p>
+            <p class="text-[10px] text-brown-500 pt-2">&copy; 2026 MTsN 1 Kota Malang. All Rights Reserved.</p>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. SIMULATION DATA & LOGIC ---
+        const simData = [
+            {
+                title: "1. Es Batu Dipanaskan / Mencair",
+                initialStatus: "Kondisi Awal: Padat (Kristal Es Bening)",
+                processedStatus: "Kondisi Akhir: Cair (Air Bening)",
+                desc: "Saat dipanaskan, es menyerap kalor sehingga ikatan antar molekul merenggang. Es berubah wujud menjadi air cair tanpa menghasilkan zat kimia baru.",
+                iconInitial: '<i class="fa-solid fa-cube text-blue-400"></i>',
+                iconProcessed: '<i class="fa-solid fa-droplet text-blue-500"></i>'
+            },
+            {
+                title: "2. Pembakaran Kertas",
+                initialStatus: "Kondisi Awal: Lembaran Kertas Putih Padat",
+                processedStatus: "Kondisi Akhir: Abu Hitam, Gas Asap, Karbon",
+                desc: "Kertas bereaksi dengan oksigen dan api. Selulosa terbakar menghasilkan zat baru berupa abu, asap (CO2), dan gas, serta tidak dapat kembali ke bentuk kertas.",
+                iconInitial: '<i class="fa-solid fa-file-lines text-amber-200"></i>',
+                iconProcessed: '<i class="fa-solid fa-fire text-orange-600"></i>'
+            },
+            {
+                title: "3. Pelarutan Gula dalam Air",
+                initialStatus: "Kondisi Awal: Serbuk Kristal Gula + Air Bening",
+                processedStatus: "Kondisi Akhir: Larutan Gula Manis Bening",
+                desc: "Molekul gula tersebar merata di antara molekul air. Sifat manis gula tidak berubah, dan air gula dapat dipisahkan kembali melalui proses penguapan.",
+                iconInitial: '<i class="fa-solid fa-spoon text-amber-600"></i>',
+                iconProcessed: '<i class="fa-solid fa-glass-water text-cyan-500"></i>'
+            },
+            {
+                title: "4. Paku Besi Berkarat",
+                initialStatus: "Kondisi Awal: Paku Besi Mengkilap Keras",
+                processedStatus: "Kondisi Akhir: Karat Besi (Fe2O3) Rapuh Cokelat",
+                desc: "Besi bereaksi secara perlahan dengan oksigen dan kelembapan air di udara membentuk zat baru yaitu besi oksida (karat) yang rapuh dan berwarna cokelat.",
+                iconInitial: '<i class="fa-solid fa-wrench text-slate-400"></i>',
+                iconProcessed: '<i class="fa-solid fa-triangle-exclamation text-amber-800"></i>'
+            },
+            {
+                title: "5. Apel Membusuk",
+                initialStatus: "Kondisi Awal: Daging Apel Segar & Manis",
+                processedStatus: "Kondisi Akhir: Daging Apel Cokelat, Lunak, Berbau",
+                desc: "Enzim dalam buah apel bereaksi dengan oksigen di udara (oksidasi) dan aktivitas mikroorganisme, menghasilkan zat baru berbau menyengat dan berubah warna.",
+                iconInitial: '<i class="fa-solid fa-apple-whole text-red-500"></i>',
+                iconProcessed: '<i class="fa-solid fa-bacteria text-lime-700"></i>'
+            }
+        ];
+
+        let currentSimIndex = 0;
+        let isProcessed = false;
+
+        function switchSim(index) {
+            currentSimIndex = index;
+            isProcessed = false;
+            
+            // Update tabs UI
+            document.querySelectorAll('.sim-tab-btn').forEach((btn, i) => {
+                if(i === index) {
+                    btn.className = "sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-brown-700 text-white shadow";
+                } else {
+                    btn.className = "sim-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap bg-white text-brown-800 hover:bg-cream-200 border border-cream-200";
+                }
+            });
+
+            // Update viewer
+            const sim = simData[index];
+            document.getElementById('sim-title').innerText = sim.title;
+            document.getElementById('sim-status').innerText = sim.initialStatus;
+            document.getElementById('sim-desc').innerText = sim.desc;
+            document.getElementById('sim-icon-container').innerHTML = sim.iconInitial;
+            
+            const btn = document.getElementById('sim-action-btn');
+            btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Jalankan Proses';
+            btn.className = "mt-4 px-5 py-2 bg-amberAccent hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition shadow-md";
+        }
+
+        function triggerSimulation() {
+            const sim = simData[currentSimIndex];
+            const iconContainer = document.getElementById('sim-icon-container');
+            const statusText = document.getElementById('sim-status');
+            const btn = document.getElementById('sim-action-btn');
+
+            if(!isProcessed) {
+                // Animate transition
+                iconContainer.classList.add('scale-125', 'rotate-12', 'opacity-50');
+                setTimeout(() => {
+                    iconContainer.innerHTML = sim.iconProcessed;
+                    iconContainer.classList.remove('scale-125', 'rotate-12', 'opacity-50');
+                    statusText.innerText = sim.processedStatus;
+                    btn.innerHTML = '<i class="fa-solid fa-rotate-left mr-1"></i> Reset Kondisi Awal';
+                    btn.className = "mt-4 px-5 py-2 bg-brown-600 hover:bg-brown-700 text-white font-bold text-xs rounded-xl transition shadow-md";
+                    isProcessed = true;
+                }, 400);
+            } else {
+                iconContainer.innerHTML = sim.iconInitial;
+                statusText.innerText = sim.initialStatus;
+                btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Jalankan Proses';
+                btn.className = "mt-4 px-5 py-2 bg-amberAccent hover:bg-amber-600 text-white font-bold text-xs rounded-xl transition shadow-md";
+                isProcessed = false;
+            }
+        }
+
+        // --- 2. GAME CLASSIFICATION LOGIC ---
+        const gameItems = [
+            { id: 'item-1', name: 'Beras ditumbuk jadi tepung', correct: 'fisika', icon: 'fa-wheat-awn' },
+            { id: 'item-2', name: 'Lilin terbakar habis', correct: 'kimia', icon: 'fa-fire-flame-curved' },
+            { id: 'item-3', name: 'Air membeku jadi es batu', correct: 'fisika', icon: 'fa-snowflake' },
+            { id: 'item-4', name: 'Nasi membusuk berbau basi', correct: 'kimia', icon: 'fa-bowl-rice' },
+            { id: 'item-5', name: 'Kain dipotong jadi baju', correct: 'fisika', icon: 'fa-scissors' },
+            { id: 'item-6', name: 'Petasan meledak', correct: 'kimia', icon: 'fa-burst' }
+        ];
+
+        let itemState = {
+            'item-1': 'pool',
+            'item-2': 'pool',
+            'item-3': 'pool',
+            'item-4': 'pool',
+            'item-5': 'pool',
+            'item-6': 'pool'
+        };
+
+        function renderGame() {
+            const poolEl = document.getElementById('card-pool');
+            const fisikaEl = document.getElementById('content-fisika');
+            const kimiaEl = document.getElementById('content-kimia');
+
+            poolEl.innerHTML = '';
+            fisikaEl.innerHTML = '';
+            kimiaEl.innerHTML = '';
+
+            let countFisika = 0;
+            let countKimia = 0;
+
+            gameItems.forEach(item => {
+                const loc = itemState[item.id];
+                const card = document.createElement('div');
+                card.className = "draggable-item bg-white p-3 rounded-xl border border-cream-300 shadow-sm flex items-center justify-between text-xs font-bold text-brown-900";
+                
+                if (loc === 'pool') {
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${item.icon} text-amberAccent text-sm"></i>
+                            <span>${item.name}</span>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="moveItem('${item.id}', 'fisika')" title="Pindah ke Fisika" class="px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-lg text-[10px]">
+                                Fisika
+                            </button>
+                            <button onclick="moveItem('${item.id}', 'kimia')" title="Pindah ke Kimia" class="px-2 py-1 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg text-[10px]">
+                                Kimia
+                            </button>
+                        </div>
+                    `;
+                    poolEl.appendChild(card);
+                } else if (loc === 'fisika') {
+                    countFisika++;
+                    card.className += " border-blue-200 bg-blue-50/50";
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${item.icon} text-blue-600"></i>
+                            <span>${item.name}</span>
+                        </div>
+                        <button onclick="moveItem('${item.id}', 'pool')" class="text-brown-500 hover:text-red-500 p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    fisikaEl.appendChild(card);
+                } else if (loc === 'kimia') {
+                    countKimia++;
+                    card.className += " border-amber-200 bg-amber-50/50";
+                    card.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid ${item.icon} text-amber-600"></i>
+                            <span>${item.name}</span>
+                        </div>
+                        <button onclick="moveItem('${item.id}', 'pool')" class="text-brown-500 hover:text-red-500 p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    kimiaEl.appendChild(card);
+                }
+            });
+
+            document.getElementById('count-fisika').innerText = `${countFisika} Kartu`;
+            document.getElementById('count-kimia').innerText = `${countKimia} Kartu`;
+        }
+
+        function moveItem(id, target) {
+            itemState[id] = target;
+            renderGame();
+        }
+
+        function checkGameScore() {
+            let correctCount = 0;
+            let unassigned = 0;
+
+            gameItems.forEach(item => {
+                const currentLoc = itemState[item.id];
+                if (currentLoc === 'pool') {
+                    unassigned++;
+                } else if (currentLoc === item.correct) {
+                    correctCount++;
+                }
+            });
+
+            const feedback = document.getElementById('game-score-feedback');
+            if (unassigned > 0) {
+                feedback.className = "text-xs font-bold text-amber-700";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1"></i> Masih ada ${unassigned} kartu yang belum dikelompokkan.`;
+            } else if (correctCount === gameItems.length) {
+                feedback.className = "text-xs font-bold text-emerald-700";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> Luar biasa! Semua ${correctCount}/${gameItems.length} klasifikasi benar! 🎉`;
+            } else {
+                feedback.className = "text-xs font-bold text-red-700";
+                feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Terdapat ${correctCount} jawaban benar dari ${gameItems.length} kartu. Periksa kembali pilihan kalian!`;
+            }
+        }
+
+        // --- 3. QUIZ GRADING LOGIC ---
+        const quizAnswers = {
+            q1: 'B',
+            q2: 'B',
+            q3: 'C',
+            q4: 'B'
+        };
+
+        function submitQuiz() {
+            let score = 0;
+            let answered = 0;
+
+            for (let q in quizAnswers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                if (selected) {
+                    answered++;
+                    if (selected.value === quizAnswers[q]) {
+                        score += 25;
+                    }
+                }
+            }
+
+            const badge = document.getElementById('quiz-score-badge');
+            const scoreVal = document.getElementById('score-val');
+            const msg = document.getElementById('quiz-msg');
+
+            badge.classList.remove('hidden');
+            scoreVal.innerText = score;
+
+            if (answered < 4) {
+                msg.className = "text-xs font-bold text-amber-700";
+                msg.innerText = "Harap isi semua 4 soal kuis!";
+            } else {
+                msg.className = "text-xs font-bold text-emerald-700";
+                msg.innerText = `Jawaban kuis berhasil tersimpan. Skor: ${score}/100`;
+            }
+        }
+
+        // --- 4. DRAFT SAVE & PDF EXPORT ---
+        function saveDraft() {
+            const kelompok = document.getElementById('nama-kelompok').value || "Tanpa Nama";
+            alert(`Draft LKPD Kelompok "${kelompok}" berhasil disimpan secara lokal pada browser ini.`);
+        }
+
+        function downloadPDF() {
+            // Set date if empty
+            if (!document.getElementById('tanggal').value) {
+                document.getElementById('tanggal').valueAsDate = new Date();
+            }
+
+            // Reset scroll position to top before capture to avoid top blank space in PDF
+            window.scrollTo(0, 0);
+
+            const element = document.getElementById('lkpd-content');
+            const kelompokName = document.getElementById('nama-kelompok').value || 'Kelompok';
+            const kelasName = document.getElementById('kelas').value || 'VII';
+            
+            const opt = {
+                margin:       [0.25, 0.25, 0.25, 0.25],
+                filename:     `LKPD_IPA_FisikaKimia_${kelompokName}_${kelasName}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+                pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+            };
+
+            // Temporary visual notification
+            const notification = document.createElement('div');
+            notification.className = "fixed top-5 right-5 z-50 bg-brown-800 text-white px-5 py-3 rounded-2xl shadow-2xl text-xs font-bold flex items-center gap-2 border border-amberAccent";
+            notification.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-amber-400 text-base"></i> Sedang membuat berkas PDF... Mohon tunggu sebentar.';
+            document.body.appendChild(notification);
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.body.removeChild(notification);
+            }).catch(err => {
+                console.error(err);
+                document.body.removeChild(notification);
+                alert("Terjadi kendala saat mengunduh PDF. Mengalihkan ke menu cetak dokumen.");
+                window.print();
+            });
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            switchSim(0);
+            renderGame();
+            document.getElementById('tanggal').valueAsDate = new Date();
+        };
+    </script>
+</body>
+</html>
